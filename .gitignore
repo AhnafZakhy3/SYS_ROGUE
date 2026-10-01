@@ -7,3 +7,6 @@ saves/
 *.egg-info/
 dist/
 build/
+
+SYS_ROGUE_Implementation_Plan.md
+SYS_ROGUE_Requirements.md
