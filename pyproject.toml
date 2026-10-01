@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sys-rogue"
+version = "0.1.0"
+description = "SYS//ROGUE — Single-player terminal roguelike in a simulated network world"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+sysrogue = "sysrogue.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

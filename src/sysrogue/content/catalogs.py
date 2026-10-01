@@ -1,0 +1,313 @@
+"""Content catalogs for SYS//ROGUE: programs, upgrades, encounters, and node archetypes."""
+
+from dataclasses import dataclass, field
+from typing import Any, Callable
+from sysrogue.entities.program import Program
+from sysrogue.entities.upgrade import Upgrade
+
+# --- Usable Programs Catalog (FR-017: At least 5 programs) ---
+def get_default_programs() -> dict[str, Program]:
+    return {
+        "sniffer": Program(
+            id="sniffer",
+            name="Packet Sniffer v1.2",
+            description="Analyzes local network packets. Reveals hidden adjacent connections and drops connection bandwidth cost by 1.",
+            cpu_cost=2,
+            ram_cost=2,
+            bandwidth_cost=1,
+            trace_impact=1,
+            category="recon",
+        ),
+        "debugger": Program(
+            id="debugger",
+            name="Interactive Debugger",
+            description="Hooks into process memory spaces, granting +3 Reverse Engineering for the current turn.",
+            cpu_cost=3,
+            ram_cost=2,
+            bandwidth_cost=0,
+            trace_impact=3,
+            category="exploit",
+        ),
+        "memscanner": Program(
+            id="memscanner",
+            name="Deep Memory Scanner",
+            description="Scans running daemon processes on the node to extract access credentials or encryption bypass keys.",
+            cpu_cost=3,
+            ram_cost=3,
+            bandwidth_cost=1,
+            trace_impact=4,
+            category="recon",
+        ),
+        "cleaner": Program(
+            id="cleaner",
+            name="Trace Scrub Daemon",
+            description="Scrambles access timestamps and proxy routes, scrubbing 15-25 points of active Trace.",
+            cpu_cost=4,
+            ram_cost=1,
+            bandwidth_cost=2,
+            trace_impact=-20,
+            category="stealth",
+        ),
+        "overclock": Program(
+            id="overclock",
+            name="Kernel Overclock",
+            description="Forces clock multiplication: restores 6 CPU cycles immediately at the cost of 5 Integrity damage.",
+            cpu_cost=0,
+            ram_cost=1,
+            bandwidth_cost=0,
+            trace_impact=5,
+            category="utility",
+        ),
+        "sandbox": Program(
+            id="sandbox",
+            name="Sandbox Isolator",
+            description="Deploys an isolated virtualization layer. Next failed check will not escalate security level or trigger alarms.",
+            cpu_cost=3,
+            ram_cost=3,
+            bandwidth_cost=1,
+            trace_impact=0,
+            category="stealth",
+        ),
+    }
+
+# --- Upgrades Catalog (FR-027: At least 10 upgrades) ---
+def get_default_upgrades() -> dict[str, Upgrade]:
+    return {
+        "cpu_bus_v2": Upgrade(
+            id="cpu_bus_v2",
+            name="Wide CPU Bus v2",
+            category="hardware",
+            cost=20,
+            description="Doubles register pipelines. +2 Max CPU and +1 Processing attribute.",
+            stat_modifiers={"processing": 1},
+            resource_max_modifiers={"max_cpu": 2},
+            rarity="common",
+        ),
+        "ram_expansion_16k": Upgrade(
+            id="ram_expansion_16k",
+            name="16KB RAM Core",
+            category="hardware",
+            cost=25,
+            description="Expands resident workspace. Increases Max RAM capacity by 4.",
+            stat_modifiers={"memory": 1},
+            resource_max_modifiers={"max_ram": 4},
+            rarity="common",
+        ),
+        "fiber_driver": Upgrade(
+            id="fiber_driver",
+            name="Optical Fiber Driver",
+            category="protocol",
+            cost=20,
+            description="High-speed network interface. +2 Max Bandwidth and +1 Network attribute.",
+            stat_modifiers={"network": 1},
+            resource_max_modifiers={"max_bandwidth": 2},
+            rarity="common",
+        ),
+        "decompiler_pro": Upgrade(
+            id="decompiler_pro",
+            name="IDA-Pattern Decompiler",
+            category="firmware",
+            cost=30,
+            description="Automated binary disassembler. +2 Reverse Engineering attribute.",
+            stat_modifiers={"reverse_eng": 2},
+            rarity="uncommon",
+        ),
+        "ghost_protocol": Upgrade(
+            id="ghost_protocol",
+            name="Ghost Protocol Mask",
+            category="protocol",
+            cost=35,
+            description="Conceals packet headers. +2 Stealth attribute and decreases trace spikes.",
+            stat_modifiers={"stealth": 2},
+            rarity="uncommon",
+        ),
+        "redundant_core": Upgrade(
+            id="redundant_core",
+            name="Redundant Fault-Tolerant Core",
+            category="hardware",
+            cost=30,
+            description="Shields vital process state. Increases Max Integrity by 25.",
+            resource_max_modifiers={"max_integrity": 25},
+            rarity="uncommon",
+        ),
+        "ice_breaker": Upgrade(
+            id="ice_breaker",
+            name="Heuristic ICE Breaker",
+            category="firmware",
+            cost=45,
+            description="Automatically bypasses security firewalls on nodes with security level 3 or below.",
+            rarity="rare",
+        ),
+        "signal_dampener": Upgrade(
+            id="signal_dampener",
+            name="Noise Injection Dampener",
+            category="hardware",
+            cost=40,
+            description="Halves all trace accrued from failed actions or security encounters.",
+            rarity="rare",
+        ),
+        "cache_optimizer": Upgrade(
+            id="cache_optimizer",
+            name="L3 Cache Optimizer",
+            category="kernel",
+            cost=35,
+            description="Restores 2 CPU cycles whenever a file or archive is successfully decrypted.",
+            rarity="uncommon",
+        ),
+        "crypto_accelerator": Upgrade(
+            id="crypto_accelerator",
+            name="ASIC Crypto Accelerator",
+            category="hardware",
+            cost=50,
+            description="Specialized math co-processor. +3 to all Decryption checks.",
+            stat_modifiers={"reverse_eng": 3},
+            rarity="rare",
+        ),
+        "heuristic_evader": Upgrade(
+            id="heuristic_evader",
+            name="Heuristic IDS Evader",
+            category="protocol",
+            cost=45,
+            description="Gives a 35% passive chance to completely evade security encounters.",
+            stat_modifiers={"stealth": 1},
+            rarity="prototype",
+        ),
+    }
+
+# --- Encounter Definition Data ---
+@dataclass
+class EncounterDefinition:
+    id: str
+    name: str
+    description: str
+    min_depth: int
+    weight: int
+    allowed_nodes: list[str]  # empty = all nodes
+    stat_to_check: str | None = None
+    difficulty: int = 10
+    success_msg: str = ""
+    fail_msg: str = ""
+
+def get_default_encounters() -> list[EncounterDefinition]:
+    return [
+        EncounterDefinition(
+            id="admin_patrol",
+            name="Active SysAdmin Patrol",
+            description="A remote system administrator opens an interactive shell session on this node.",
+            min_depth=1,
+            weight=10,
+            allowed_nodes=[],
+            stat_to_check="stealth",
+            difficulty=12,
+            success_msg="You masqueraded as a dormant system worker. The administrator logged off without noticing.",
+            fail_msg="The admin noticed an unauthorized socket! Security alerts tripped, Trace +15.",
+        ),
+        EncounterDefinition(
+            id="memory_leak",
+            name="Kernel Memory Fragmentation",
+            description="A sudden memory leak causes allocation stalls across the local bus.",
+            min_depth=1,
+            weight=8,
+            allowed_nodes=["workstation", "database", "research"],
+            stat_to_check="processing",
+            difficulty=11,
+            success_msg="You reallocated page tables smoothly and salvaged 15 discarded transaction credits.",
+            fail_msg="Memory thrashing! CPU drained by 4 and process took 5 Integrity damage.",
+        ),
+        EncounterDefinition(
+            id="rogue_daemon",
+            name="Autonomous Rogue Subroutine",
+            description="A rogue experimental process challenges your probe for control of the bus.",
+            min_depth=2,
+            weight=7,
+            allowed_nodes=["research", "backupserver", "fileserver"],
+            stat_to_check="reverse_eng",
+            difficulty=13,
+            success_msg="You disassembled the rogue subroutine and integrated its salvage code (+25 credits).",
+            fail_msg="The daemon collided with your thread! Integrity took 15 damage.",
+        ),
+        EncounterDefinition(
+            id="firewall_pulse",
+            name="Intrusion Defense Pulse",
+            description="The perimeter gateway emits a synchronized integrity ping across connections.",
+            min_depth=2,
+            weight=9,
+            allowed_nodes=[],
+            stat_to_check="network",
+            difficulty=12,
+            success_msg="You routed the ping into a null reflector. Trace remained undisturbed.",
+            fail_msg="Ping deflected poorly! Bandwidth drained by 3 and Trace +10.",
+        ),
+        EncounterDefinition(
+            id="abandoned_cache",
+            name="Unindexed Data Dump",
+            description="You stumbled upon an unlinked temporary memory cache left by a defunct process.",
+            min_depth=1,
+            weight=9,
+            allowed_nodes=["workstation", "fileserver", "backupserver"],
+            stat_to_check="reverse_eng",
+            difficulty=10,
+            success_msg="You recovered scrap code and archived credentials (+20 credits, +2 CPU).",
+            fail_msg="The cache was corrupted by bad sectors. Yielded nothing.",
+        ),
+        EncounterDefinition(
+            id="honeypot_ping",
+            name="Honeypot Decoy Tripwire",
+            description="A stealth listener process disguised as an open telnet service is monitoring requests.",
+            min_depth=2,
+            weight=7,
+            allowed_nodes=["workstation", "adminpanel", "database"],
+            stat_to_check="stealth",
+            difficulty=13,
+            success_msg="You recognized the honeypot fingerprint and severed the connection before telemetry was sent.",
+            fail_msg="Honeypot triggered! Security telemetry broadcast. Trace +20, Security Alert increased.",
+        ),
+        EncounterDefinition(
+            id="backup_routine",
+            name="Automated Snapshot Cycle",
+            description="The storage controller initiates a scheduled differential backup snapshot.",
+            min_depth=1,
+            weight=6,
+            allowed_nodes=["backupserver", "fileserver", "database"],
+            stat_to_check="processing",
+            difficulty=11,
+            success_msg="You piggybacked on the snapshot daemon to map an adjacent undiscovered host!",
+            fail_msg="Snapshot locked the local bus for 1 turn.",
+        ),
+        EncounterDefinition(
+            id="power_surge",
+            name="Power Distribution Fluctuation",
+            description="A power bus spike ripples through the node's voltage regulators.",
+            min_depth=1,
+            weight=6,
+            allowed_nodes=[],
+            stat_to_check=None,
+            difficulty=0,
+            success_msg="The surge overcharged capacitors: all CPU cycles instantly restored to maximum!",
+            fail_msg="",
+        ),
+        EncounterDefinition(
+            id="traceroute_lock",
+            name="Active Hunter Daemon Ping",
+            description="An autonomous IDS hunter daemon locks onto your MAC signature and begins back-tracing.",
+            min_depth=3,
+            weight=6,
+            allowed_nodes=["adminpanel", "monitor", "research"],
+            stat_to_check="network",
+            difficulty=14,
+            success_msg="You forged IP spoofing tables and threw the hunter off your trail.",
+            fail_msg="Hunter locked coordinates! Trace +25 and lockdown countdown initiated.",
+        ),
+        EncounterDefinition(
+            id="classified_broadcast",
+            name="Encrypted Kernel Broadcast",
+            description="An anomalous broadcast packet from unknown node 'PROJECT_NEMESIS' is intercepted.",
+            min_depth=2,
+            weight=6,
+            allowed_nodes=["research", "monitor", "adminpanel"],
+            stat_to_check="reverse_eng",
+            difficulty=12,
+            success_msg="Intercepted decrypted broadcast: 'NEMESIS ARCHIVE relocated to VAULT-01. Extraction at GATEWAY-01.'",
+            fail_msg="Transmission garbled in transit. Unable to decrypt payload.",
+        ),
+    ]
